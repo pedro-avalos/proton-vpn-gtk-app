@@ -1,3 +1,12 @@
+version: 4.8.3rc1
+time: 2024/12/19 14:32
+author: Luke Titley
+email: luke.titley@proton.ch
+urgency: low
+stability: unstable
+description:
+- Display server load in search results
+---
 version: 4.8.2
 time: 2024/12/18 12:00
 author: Alexandru Cheltuitor

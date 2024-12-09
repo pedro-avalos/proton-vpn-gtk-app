@@ -38,7 +38,10 @@ MAX_SEARCH_RESULTS_PER_SECTION = 100
 
 # Column indexes in the tree model for the FilteredList.
 COLUMN_NAME = 0  # The name of the item.
-COLUMN_SENSITIVE = 1  # Whether the item is sensitive to selection.
+COLUMN_LOAD = 1  # The server load
+COLUMN_LOAD_COLOR = 2  # Sets the column color.
+COLUMN_SENSITIVE = 3  # Whether the item is sensitive to selection.
+LOAD_COLOR = "Grey"  # We want to show the load % in grey.
 
 
 class FilteredList(Gtk.TreeView):
@@ -46,13 +49,13 @@ class FilteredList(Gtk.TreeView):
     Displays a list of countries and servers in a tree view.
     """
     def __init__(self,
-                 countries: Callable[[Optional[str]], List[str]],
-                 servers: Callable[[Optional[str]], List[str]]
+                 countries: Callable[[Optional[str]], List[(str, int)]],
+                 servers: Callable[[Optional[str]], List[(str, int)]]
                  ):
         super().__init__()
         self._countries = countries
         self._servers = servers
-        self._model = Gtk.TreeStore(str, bool)
+        self._model = Gtk.TreeStore(str, str, str, bool)
         self.set_model(Gtk.TreeModelSort(model=self._model))
 
         self.set_show_expanders(False)
@@ -67,10 +70,22 @@ class FilteredList(Gtk.TreeView):
             return False
         self.get_selection().set_select_function(select_function)
 
-        column = Gtk.TreeViewColumn(cell_renderer=Gtk.CellRendererText(),
-                                    text=0, sensitive=1)
-        self.append_column(column)
-        column.set_sort_column_id(0)
+        # server name
+        name_column = Gtk.TreeViewColumn("Name",
+                                         cell_renderer=Gtk.CellRendererText(),
+                                         text=COLUMN_NAME,
+                                         sensitive=COLUMN_SENSITIVE)
+
+        self.append_column(name_column)
+
+        # server load
+        load_column = Gtk.TreeViewColumn("Load",
+                                         cell_renderer=Gtk.CellRendererText(),
+                                         text=COLUMN_LOAD,
+                                         sensitive=COLUMN_SENSITIVE,
+                                         foreground=COLUMN_LOAD_COLOR)
+
+        self.append_column(load_column)
 
         self.set_headers_visible(False)
 
@@ -87,12 +102,15 @@ class FilteredList(Gtk.TreeView):
             section_name, section_data = section
             data = list(section_data(search_text))
             if data:
-                row = [f"{section_name} ({len(data)})", False]
+                row = [f"{section_name} ({len(data)})", "", LOAD_COLOR, False]
                 root = self._model.append(None, row)
-                for i, item in enumerate(data):
-                    self._model.append(root, [item, True])
+                for i, (name, load) in enumerate(data):
+                    load_string = "" if load is None else f"{load}%"
+                    self._model.append(root,
+                                       [name, load_string, LOAD_COLOR, True])
                     if i == MAX_SEARCH_RESULTS_PER_SECTION:
-                        self._model.append(None, ["...", False])
+                        self._model.append(None,
+                                           ["...", "", LOAD_COLOR, False])
                         break
 
         self.expand_all()
@@ -121,7 +139,7 @@ class SearchResults(Gtk.ScrolledWindow):
             if server_list:
                 for server in controller.server_list:
                     if search_text and (search_text in server.entry_country_name.lower()):
-                        result.add(server.entry_country_name)
+                        result.add((server.entry_country_name, None))
             return result
 
         def servers(search_text: str = None):
@@ -131,7 +149,7 @@ class SearchResults(Gtk.ScrolledWindow):
                 for server in controller.server_list:
                     if server.tier <= user_tier:
                         if search_text and (search_text in server.name.lower()):
-                            yield server.name
+                            yield (server.name, server.load)
 
         self._filtered_country_list = FilteredList(countries, servers)
         self._filtered_country_list.connect("row-activated",
