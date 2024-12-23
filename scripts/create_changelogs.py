@@ -16,10 +16,11 @@ ROOT = os.path.dirname(
 
 NAME      = "proton-vpn-gtk-app" # Name of this application.
 VERSIONS  = os.path.join(ROOT, "versions.yml") # Name of this applications versions.yml
-RPM       = os.path.join(ROOT, "rpmbuild", "SPECS", "package.spec") # Path of spec filefor rpm.
+RPM       = os.path.join(ROOT, "rpmbuild", "SPECS", "package.spec")  # Path of spec filefor rpm.
 RPM_TMPLT = os.path.join(ROOT, "rpmbuild", "SPECS", "package.spec.template")  # Path of template spec file for rpm.
 DEB       = os.path.join(ROOT, "debian", "changelog")  # Path of debian changelog.
-MARKDOWN  = os.path.join(ROOT, "CHANGELOG.md",) # Path of CHANGELOG.md.
+MARKDOWN  = os.path.join(ROOT, "CHANGELOG.md",)  # Path of CHANGELOG.md.
+
 
 def build():
     '''
@@ -35,6 +36,7 @@ def build():
         versions.build_rpm(RPM,      versions_yml, RPM_TMPLT)
         versions.build_deb(DEB,      versions_yml, NAME)
         versions.build_mkd(MARKDOWN, versions_yml)
+
 
 if __name__ == "__main__":
     build()
