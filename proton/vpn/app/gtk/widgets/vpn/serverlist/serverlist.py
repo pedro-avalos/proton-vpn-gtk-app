@@ -29,8 +29,7 @@ from gi.repository import GLib, GObject
 
 from proton.vpn.app.gtk import Gtk
 from proton.vpn.app.gtk.controller import Controller
-from proton.vpn.app.gtk.widgets.vpn.serverlist.country import (
-    CountryRow, ImmediateCountryRow, DeferredCountryRow)
+from proton.vpn.app.gtk.widgets.vpn.serverlist.country import DeferredCountryRow
 from proton.vpn.session.servers import Country, LogicalServer, ServerList
 from proton.vpn import logging
 
@@ -51,7 +50,7 @@ class ServerListWidgetState:
     """
     user_tier: int = None
     server_list: ServerList = None
-    country_rows: Dict[str, CountryRow] = field(default_factory=dict)
+    country_rows: Dict[str, DeferredCountryRow] = field(default_factory=dict)
 
     def get_server_by_id(self, server_id: str) -> LogicalServer:
         """Returns the server with the given name."""
@@ -66,11 +65,7 @@ class ServerListWidget(Gtk.ScrolledWindow):
     # Number of seconds to wait before checking if the servers cache expired.
     RELOAD_INTERVAL_IN_SECONDS = 60
 
-    def __init__(
-        self,
-        controller: Controller,
-        deferred_country_row: bool = False,
-    ):
+    def __init__(self, controller: Controller):
         super().__init__()
         self.set_policy(
             hscrollbar_policy=Gtk.PolicyType.NEVER,
@@ -82,7 +77,6 @@ class ServerListWidget(Gtk.ScrolledWindow):
         self.add(self._container)
 
         self._state = ServerListWidgetState()
-        self._deferred_country_row = deferred_country_row
 
         self.connect("unrealize", self._on_unrealize)
 
@@ -99,7 +93,7 @@ class ServerListWidget(Gtk.ScrolledWindow):
         Mainly used for test purposes."""
 
     @property
-    def country_rows(self) -> List[CountryRow]:
+    def country_rows(self) -> List[DeferredCountryRow]:
         """Returns the list of country rows that are currently being displayed.
         This method was made available for tests."""
         return list(self._state.country_rows.values())
@@ -151,37 +145,6 @@ class ServerListWidget(Gtk.ScrolledWindow):
             "Partial server list widget update completed in "
             f"{time.time() - start:.2f} seconds."
         )
-
-    def _legacy_filter_ui(self, search_entry: Gtk.SearchEntry):
-        """This filters the countries in the server list based on the contents
-           of the given search entry.
-        """
-        start_time = time.time()
-        entry_text = search_entry.get_text().lower().replace(" ", "")
-
-        for country_row in self.country_rows:
-            country_match = entry_text in country_row.header_searchable_content
-
-            server_match = False
-            for server_row in country_row.server_rows:
-                # Show server rows if they match the search text, or if they belong to
-                # a country that matches the search text. Otherwise, hide them.
-                server_row_visible = entry_text in server_row.searchable_content
-                server_row.set_visible(server_row_visible or country_match)
-                if server_row_visible and entry_text:
-                    server_match = True
-
-            # If there was at least a server in the current country row matching
-            # the search text then expand country servers. Otherwise, collapse them.
-            country_row.set_servers_visibility(server_match)
-
-            # Show the whole country row if there was either a server match or
-            # a country match. Otherwise, hide it.
-            country_row.set_visible(server_match or country_match)
-
-        self.emit("filter-complete")
-        end_time = time.time()
-        logger.info(f"Filter done in {(end_time - start_time) * 1000:.2f} ms.")
 
     def focus_on_entry(self, _widget, name_to_search: str) -> None:
         """Searches for an entry by name and either connects to it directly,
@@ -236,7 +199,7 @@ class ServerListWidget(Gtk.ScrolledWindow):
                 expand=False, fill=False, padding=0
             )
 
-    def _create_new_country_rows(self, old_country_rows) -> Dict[str, CountryRow]:
+    def _create_new_country_rows(self, old_country_rows) -> Dict[str, DeferredCountryRow]:
         """Returns new country rows."""
         countries = self._state.server_list.group_by_country()
         if self._state.user_tier == 0:
@@ -248,18 +211,13 @@ class ServerListWidget(Gtk.ScrolledWindow):
         if self._controller.is_connection_active:  # noqa: E501 # pylint: disable=line-too-long # nosemgrep: python.lang.maintainability.is-function-without-parentheses.is-function-without-parentheses
             connected_server_id = self._controller.current_server_id
 
-        # Chose the deferred loading country row if that was the configuration
-        # given to this widget.
-        Row = (DeferredCountryRow
-               if self._deferred_country_row else ImmediateCountryRow)
-
         new_country_rows = {}
         for country in countries:
             show_country_servers = False
             if old_country_rows and old_country_rows.get(country.code):
                 show_country_servers = old_country_rows[country.code].showing_servers
 
-            country_row = Row(
+            country_row = DeferredCountryRow(
                 country=country,
                 user_tier=self._state.user_tier,
                 controller=self._controller,
@@ -270,7 +228,7 @@ class ServerListWidget(Gtk.ScrolledWindow):
 
         return new_country_rows
 
-    def _get_country_row(self, server_id: str) -> CountryRow:
+    def _get_country_row(self, server_id: str) -> DeferredCountryRow:
         """Returns a country row based on the vpn server."""
         logical_server = self._state.get_server_by_id(server_id)
         country_code = logical_server.exit_country.lower()

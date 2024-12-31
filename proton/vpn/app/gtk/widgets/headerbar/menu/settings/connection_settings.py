@@ -62,8 +62,7 @@ class ConnectionSettings(BaseCategoryContainer):  # pylint: disable=too-many-ins
         self.build_protocol()
         self.build_vpn_accelerator()
         self.build_moderate_nat()
-        if self._controller.feature_flags.get("IPv6Support"):
-            self.build_ipv6()
+        self.build_ipv6()
         if self._controller.feature_flags.get("CustomDNS"):
             self.build_custom_dns()
 

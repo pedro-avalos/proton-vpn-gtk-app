@@ -91,12 +91,7 @@ class VPNWidget(Gtk.Box):
         self.pack_start(self.quick_connect_widget, expand=False, fill=False,
                         padding=0)
 
-        new_search_enabled =\
-            self._controller.feature_flags.get(LINUX_DEFERRED_UI)\
-            if self._controller.feature_flags else False
-        self.server_list_widget =\
-            ServerListWidget(self._controller,
-                             deferred_country_row=new_search_enabled)
+        self.server_list_widget = ServerListWidget(self._controller)
         self.pack_end(self.server_list_widget, expand=True, fill=True, padding=0)
         self.server_list_widget.connect("ui-updated",
                                         self._on_server_list_updated)
@@ -107,35 +102,25 @@ class VPNWidget(Gtk.Box):
             target_signal="request_focus",
             shortcut="<Control>f"
         )
-        if new_search_enabled:
-            self.search_results_widget = SearchResults(self._controller)
-            revealer = Gtk.Revealer()
-            revealer.add(self.search_results_widget)
+        self.search_results_widget = SearchResults(self._controller)
+        revealer = Gtk.Revealer()
+        revealer.add(self.search_results_widget)
 
-            self.search_widget.connect(
-                "search-changed",
-                self.search_results_widget.on_search_changed,
-                revealer
-            )
-            self.search_results_widget.connect(
-                "result-chosen",
-                self.server_list_widget.focus_on_entry
-            )
-            self.search_results_widget.connect(
-                "result-chosen",
-                lambda _, row: self.search_widget.reset()  # pylint: disable=no-member, disable=line-too-long # noqa: E501 # nosemgrep: python.lang.correctness.return-in-init.return-in-init
-            )
-            self.pack_start(self.search_widget, expand=False, fill=True,
-                            padding=0)
-            self.pack_start(revealer, expand=False, fill=False, padding=0)
-        else:
-            self.search_widget.connect(
-                "search-changed", self.server_list_widget._legacy_filter_ui)
-            self.server_list_widget.connect(
-                "ui-updated", lambda _: self.search_widget.reset()  # pylint: disable=no-member, disable=line-too-long # noqa: E501 # nosemgrep: python.lang.correctness.return-in-init.return-in-init
-            )
-            self.pack_start(self.search_widget, expand=False, fill=True,
-                            padding=0)
+        self.search_widget.connect(
+            "search-changed",
+            self.search_results_widget.on_search_changed,
+            revealer
+        )
+        self.search_results_widget.connect(
+            "result-chosen",
+            self.server_list_widget.focus_on_entry
+        )
+        self.search_results_widget.connect(
+            "result-chosen",
+            lambda _, row: self.search_widget.reset()  # pylint: disable=no-member, disable=line-too-long # noqa: E501 # nosemgrep: python.lang.correctness.return-in-init.return-in-init
+        )
+        self.pack_start(self.search_widget, expand=False, fill=True, padding=0)
+        self.pack_start(revealer, expand=False, fill=False, padding=0)
 
         self.connection_status_subscribers = []
         for widget in [

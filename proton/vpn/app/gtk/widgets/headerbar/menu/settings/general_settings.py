@@ -111,9 +111,7 @@ class GeneralSettings(BaseCategoryContainer):  # pylint: disable=too-many-instan
             self.build_tray_pinned_servers()
 
         self.build_anonymous_crash_reports()
-
-        if self._controller.feature_flags.get("LinuxBetaToggle"):
-            self.build_beta_upgrade()
+        self.build_beta_upgrade()
 
     def build_connect_at_app_startup(self):
         """Builds and adds the `connect_at_app_startup` setting to the widget."""

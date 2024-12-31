@@ -49,25 +49,6 @@ def test_autoconnect_feature(
 
 
 @patch("proton.vpn.app.gtk.controller.Controller.get_settings")
-def test_get_available_protocols_returns_list_of_protocols_which_excludes_wireguard_when_feature_flag_is_disabled_and_selected_protocol_is_openvpn(mock_get_settings):
-    mock_connector = Mock()
-    mock_api = Mock()
-    controller = Controller(
-        executor=Mock(),
-        exception_handler=Mock(),
-        api=mock_api,
-        vpn_reconnector=Mock(),
-        app_config=Mock(),
-        vpn_connector=mock_connector
-    )
-    mock_get_settings.return_value.protocol = MockOpenVPNTCP.cls.protocol
-    mock_api.refresher.feature_flags.get.return_value = False
-    mock_connector.get_available_protocols_for_backend.return_value = [MockOpenVPNUDP, MockOpenVPNTCP, MockWireGuard]
-    protocols = controller.get_available_protocols()
-    assert MockWireGuard not in protocols
-
-
-@patch("proton.vpn.app.gtk.controller.Controller.get_settings")
 def test_get_available_protocols_returns_list_of_protocols_which_includes_wireguard_when_feature_flag_is_disabled_and_selected_protocol_is_wireguard(mock_get_settings):
     mock_connector = Mock()
     mock_api = Mock()

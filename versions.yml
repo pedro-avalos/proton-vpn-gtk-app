@@ -1,3 +1,12 @@
+version: 4.8.3rc2
+time: 2024/12/31 15:00
+author: Alexandru Cheltuitor
+email: alexandru.cheltuitor@proton.ch
+urgency: low
+stability: unstable
+description:
+- Cleanup old feature flags.
+---
 version: 4.8.3rc1
 time: 2024/12/19 14:32
 author: Luke Titley
