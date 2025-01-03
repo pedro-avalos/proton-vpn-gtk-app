@@ -523,8 +523,7 @@ class DeferredCountryRow(Gtk.Box):  # pylint: disable=too-many-instance-attribut
     def connection_status_update(self, connection_state):
         """This method is called by VPNWidget whenever the VPN connection status changes."""
         self._country_header.connection_state = connection_state.type
-        self._connected_server_id =\
-            connection_state.context.connection.server_id
+        self._connected_server_id = connection_state.context.connection.server_id
         server = self._indexed_server_rows.get(self._connected_server_id, None)
         if server:
             server.connection_state = connection_state.type

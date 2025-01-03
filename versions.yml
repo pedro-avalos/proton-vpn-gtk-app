@@ -1,3 +1,12 @@
+version: 4.8.3rc3
+time: 2025/01/06 15:00
+author: Alexandru Cheltuitor
+email: alexandru.cheltuitor@proton.ch
+urgency: low
+stability: unstable
+description:
+- Add back tests and improve code readability.
+---
 version: 4.8.3rc2
 time: 2024/12/31 15:00
 author: Alexandru Cheltuitor

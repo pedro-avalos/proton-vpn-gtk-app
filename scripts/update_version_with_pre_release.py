@@ -51,7 +51,7 @@ def write_to_file(new_content: List[Dict[str, Union[str, int]]]) -> None:
             versions_file.write(line)
 
 
-def append_pre_release_to_latest_version(_pre_release: str) -> dict:
+def append_pre_release_to_latest_version(_pre_release: str) -> None:
     """Appends a release channel to the latest version."""
     content = read_from_file()
     cleaned_version = content[0].rstrip()

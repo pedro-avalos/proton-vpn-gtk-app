@@ -20,7 +20,7 @@ You should have received a copy of the GNU General Public License
 along with ProtonVPN.  If not, see <https://www.gnu.org/licenses/>.
 """
 from __future__ import annotations
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Set, Tuple, Generator
 
 from gi.repository import GObject
 
@@ -48,10 +48,11 @@ class FilteredList(Gtk.TreeView):
     """
     Displays a list of countries and servers in a tree view.
     """
-    def __init__(self,
-                 countries: Callable[[Optional[str]], List[(str, int)]],
-                 servers: Callable[[Optional[str]], List[(str, int)]]
-                 ):
+    def __init__(
+        self,
+        countries: Callable[[Optional[str]], List[(str, int)]],
+        servers: Callable[[Optional[str]], List[(str, int)]]
+    ):
         super().__init__()
         self._countries = countries
         self._servers = servers
@@ -61,29 +62,39 @@ class FilteredList(Gtk.TreeView):
         self.set_show_expanders(False)
         self.set_activate_on_single_click(True)
 
-        def select_function(_treeselection, model, path, _current):
+        def select_function(
+            _treeselection: Gtk.TreeSelection,
+            model: Gtk.TreeModel,
+            path: Gtk.TreePath,
+            _current: bool
+        ) -> bool:
             tree_iter = model.get_iter(path)
-            if tree_iter:
-                sensitivity = model.get_value(tree_iter, COLUMN_SENSITIVE)
-                return sensitivity
+            if not tree_iter:
+                return False
 
-            return False
+            sensitivity = model.get_value(tree_iter, COLUMN_SENSITIVE)
+            return sensitivity
+
         self.get_selection().set_select_function(select_function)
 
         # server name
-        name_column = Gtk.TreeViewColumn("Name",
-                                         cell_renderer=Gtk.CellRendererText(),
-                                         text=COLUMN_NAME,
-                                         sensitive=COLUMN_SENSITIVE)
+        name_column = Gtk.TreeViewColumn(
+            "Name",
+            cell_renderer=Gtk.CellRendererText(),
+            text=COLUMN_NAME,
+            sensitive=COLUMN_SENSITIVE
+        )
 
         self.append_column(name_column)
 
         # server load
-        load_column = Gtk.TreeViewColumn("Load",
-                                         cell_renderer=Gtk.CellRendererText(),
-                                         text=COLUMN_LOAD,
-                                         sensitive=COLUMN_SENSITIVE,
-                                         foreground=COLUMN_LOAD_COLOR)
+        load_column = Gtk.TreeViewColumn(
+            "Load",
+            cell_renderer=Gtk.CellRendererText(),
+            text=COLUMN_LOAD,
+            sensitive=COLUMN_SENSITIVE,
+            foreground=COLUMN_LOAD_COLOR
+        )
 
         self.append_column(load_column)
 
@@ -101,17 +112,23 @@ class FilteredList(Gtk.TreeView):
         for section in sections:
             section_name, section_data = section
             data = list(section_data(search_text))
-            if data:
-                row = [f"{section_name} ({len(data)})", "", LOAD_COLOR, False]
-                root = self._model.append(None, row)
-                for i, (name, load) in enumerate(data):
-                    load_string = "" if load is None else f"{load}%"
-                    self._model.append(root,
-                                       [name, load_string, LOAD_COLOR, True])
-                    if i == MAX_SEARCH_RESULTS_PER_SECTION:
-                        self._model.append(None,
-                                           ["...", "", LOAD_COLOR, False])
-                        break
+            if not data:
+                continue
+
+            row = [f"{section_name} ({len(data)})", "", LOAD_COLOR, False]
+            root = self._model.append(None, row)
+            for i, (name, load) in enumerate(data):
+                load_string = "" if load is None else f"{load}%"
+                self._model.append(
+                    root,
+                    [name, load_string, LOAD_COLOR, True]
+                )
+                if i == MAX_SEARCH_RESULTS_PER_SECTION:
+                    self._model.append(
+                        None,
+                        ["...", "", LOAD_COLOR, False]
+                    )
+                    break
 
         self.expand_all()
 
@@ -133,30 +150,54 @@ class SearchResults(Gtk.ScrolledWindow):
 
         self._revealer = None
 
-        def countries(search_text: str = None):
+        def countries(search_text: str = None) -> Set(Optional[Tuple[str, None]]):
             result = set({})
             server_list = controller.server_list
-            if server_list:
-                for server in controller.server_list:
-                    if search_text and (search_text in server.entry_country_name.lower()):
-                        result.add((server.entry_country_name, None))
+
+            if not server_list:
+                return result
+
+            for server in controller.server_list:
+                if self._search_input_exists(search_text, server, entry_country_name=True):
+                    result.add((server.entry_country_name, None))
+
             return result
 
-        def servers(search_text: str = None):
+        def servers(search_text: str = None) -> Generator[Tuple[Optional[str], Optional[int]]]:
+            def user_tier_allows_access_to_server(server_tier: int, user_tier: int) -> bool:
+                return server_tier <= user_tier
+
             user_tier = controller.user_tier
             server_list = controller.server_list
-            if server_list:
-                for server in controller.server_list:
-                    if server.tier <= user_tier:
-                        if search_text and (search_text in server.name.lower()):
-                            yield (server.name, server.load)
+            if not server_list:
+                yield (None, None)
+
+            for server in controller.server_list:
+                if not user_tier_allows_access_to_server(server.tier, user_tier):
+                    continue
+
+                if self._search_input_exists(search_text, server, server_name=True):
+                    yield (server.name, server.load)
 
         self._filtered_country_list = FilteredList(countries, servers)
-        self._filtered_country_list.connect("row-activated",
-                                            self._on_row_activated)
+        self._filtered_country_list.connect(
+            "row-activated", self._on_row_activated
+        )
 
-        self._container.pack_start(self._filtered_country_list, expand=True,
-                                   fill=True, padding=0)
+        self._container.pack_start(
+            self._filtered_country_list, expand=True, fill=True, padding=0
+        )
+
+    def _search_input_exists(
+        self, search_text: str, server, entry_country_name: bool = False, server_name: bool = False
+    ) -> bool:
+        if entry_country_name:
+            return search_text and (search_text in server.entry_country_name.lower())
+
+        if server_name:
+            return search_text and (search_text in server.name.lower())
+
+        return None
 
     @GObject.Signal(name="result-chosen", arg_types=(str,))
     def result_chosen(self, _row: str):
@@ -168,11 +209,7 @@ class SearchResults(Gtk.ScrolledWindow):
         self._revealer = revealer
 
         self._filtered_country_list.update(search_text)
-
-        if search_text:
-            self._revealer.set_reveal_child(True)
-        elif self._revealer:
-            self._revealer.set_reveal_child(False)
+        self._revealer.set_reveal_child(bool(search_text))
 
     def _on_row_activated(
         self,
