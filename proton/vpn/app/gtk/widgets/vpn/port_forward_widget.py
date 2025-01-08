@@ -68,7 +68,7 @@ class PortForwardWidget(Gtk.EventBox):
                 )
             )
         )
-        self.set_state(Gtk.StateType.NORMAL)
+        self.set_state_flags(Gtk.StateFlags.NORMAL, True)
 
     @GObject.Signal(name="update-visibility", arg_types=(bool,))
     def update_visibility(self, display_child: bool):
@@ -158,18 +158,18 @@ class PortForwardWidget(Gtk.EventBox):
             port_to_be_copied_to_clipboard,
             number_of_bytes_in_the_string
         )
-        self.set_state(Gtk.StateType.ACTIVE)
+        self.set_state_flags(Gtk.StateFlags.ACTIVE, True)
 
     def _on_button_release(
         self, _: "PortForwardWidget", __: Gdk.EventButton
     ):
-        self.set_state(Gtk.StateType.PRELIGHT)
+        self.set_state_flags(Gtk.StateFlags.PRELIGHT, True)
 
     def _on_enter_port_forwarding_box(self, _: "PortForwardWidget", __: Gdk.EventButton):
-        self.set_state(Gtk.StateType.PRELIGHT)
+        self.set_state_flags(Gtk.StateFlags.PRELIGHT, True)
 
     def _on_leave_port_forwarding_box(self, _: "PortForwardWidget", __: Gdk.EventButton):
-        self.set_state(Gtk.StateType.NORMAL)
+        self.set_state_flags(Gtk.StateFlags.NORMAL, True)
 
     def set_port_forward_label(self, new_port: int):
         """Helper method to set port forward label."""

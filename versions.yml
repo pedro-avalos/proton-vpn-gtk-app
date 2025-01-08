@@ -1,3 +1,12 @@
+version: 4.8.3rc4
+time: 2025/01/08 14:00
+author: Alexandru Cheltuitor
+email: alexandru.cheltuitor@proton.ch
+urgency: low
+stability: unstable
+description:
+- Replace deprecated `set_state` for `set_state_flags`.
+---
 version: 4.8.3rc3
 time: 2025/01/06 15:00
 author: Alexandru Cheltuitor
