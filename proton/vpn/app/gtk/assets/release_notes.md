@@ -1,3 +1,7 @@
+## 4.8.3
+- Introduced load percentages in server search results, see server loads at a glance.
+- Minor packaging improvements.
+
 ## 4.8.2
 - WireGuard is now the default protocol for new users.
 - Bug fixes and performance improvements.

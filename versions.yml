@@ -1,38 +1,14 @@
-version: 4.8.3rc4
-time: 2025/01/08 14:00
-author: Alexandru Cheltuitor
-email: alexandru.cheltuitor@proton.ch
-urgency: low
-stability: unstable
-description:
-- Replace deprecated `set_state` for `set_state_flags`.
----
-version: 4.8.3rc3
-time: 2025/01/06 15:00
-author: Alexandru Cheltuitor
-email: alexandru.cheltuitor@proton.ch
-urgency: low
-stability: unstable
-description:
-- Add back tests and improve code readability.
----
-version: 4.8.3rc2
-time: 2024/12/31 15:00
-author: Alexandru Cheltuitor
-email: alexandru.cheltuitor@proton.ch
-urgency: low
-stability: unstable
-description:
-- Cleanup old feature flags.
----
-version: 4.8.3rc1
-time: 2024/12/19 14:32
-author: Luke Titley
+version: 4.8.3
+time: 2025/01/20 10:00
+author: Alexandru Cheltuitor and Luke Titley
 email: luke.titley@proton.ch
 urgency: low
 stability: unstable
 description:
-- Display server load in search results
+- Replace deprecated `set_state` for `set_state_flags`. (Alexandru Cheltuitor)
+- Add back tests and improve code readability. (Alexandru Cheltuitor)
+- Cleanup old feature flags. (Alexandru Cheltuitor)
+- Display server load in search results. (Luke Titley)
 ---
 version: 4.8.2
 time: 2024/12/18 12:00
