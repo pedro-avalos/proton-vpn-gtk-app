@@ -283,7 +283,6 @@ class ToggleWidget(Gtk.Grid):  # pylint: disable=too-many-instance-attributes
     def _build_ui(self):
         """Builds the UI depending if an upgrade is required or not."""
         if self._is_upgrade_required:
-            self.save_setting(False)
             self.switch = UpgradePlusTag()
 
         self.attach(self.label, 0, 0, 1, 1)
