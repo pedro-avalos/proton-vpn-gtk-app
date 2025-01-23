@@ -41,6 +41,7 @@ class VPNMonitor:
         self._vpn_connector = vpn_connector
         self.vpn_drop_callback: Optional[Callable] = None
         self.vpn_up_callback: Optional[Callable] = None
+        self.vpn_disconnected_callback: Optional[Callable] = None
 
     def enable(self):
         """Enables VPN connection monitoring."""
@@ -59,3 +60,8 @@ class VPNMonitor:
 
         if isinstance(connection_status, states.Connected) and self.vpn_up_callback:
             GLib.idle_add(self.vpn_up_callback)  # pylint: disable=not-callable
+
+        if isinstance(connection_status, states.Disconnected) \
+                and not connection_status.context.reconnection \
+                and self.vpn_disconnected_callback:
+            GLib.idle_add(self.vpn_disconnected_callback)  # pylint: disable=not-callable

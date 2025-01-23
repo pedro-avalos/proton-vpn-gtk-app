@@ -65,6 +65,7 @@ class VPNReconnector:  # pylint: disable=too-many-instance-attributes
         self._vpn_monitor = vpn_monitor
         self._vpn_monitor.vpn_drop_callback = self._on_vpn_drop
         self._vpn_monitor.vpn_up_callback = self._on_vpn_up
+        self._vpn_monitor.vpn_disconnected_callback = self._on_vpn_disconnected
 
         self._network_monitor = network_monitor
         self._network_monitor.network_up_callback = self._on_network_up
@@ -208,6 +209,11 @@ class VPNReconnector:  # pylint: disable=too-many-instance-attributes
     def _on_vpn_up(self):
         """Callback called by the VPN monitor when the VPN connection is up."""
         logger.debug("VPN connection is up.")
+        self._reset_retry_counter()
+
+    def _on_vpn_disconnected(self):
+        """Callback called by the VPN monitor when the VPN connection is disconnected."""
+        logger.info("VPN connection is disconnected.")
         self._reset_retry_counter()
 
     def _reconnect(self):

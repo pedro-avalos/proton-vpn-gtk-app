@@ -1,3 +1,12 @@
+version: 4.8.5rc1
+time: 2025/01/23 10:08
+author: Josep Llaneras
+email: josep.llaneras@proton.ch
+urgency: low
+stability: unstable
+description:
+- Fix cancel connection.
+---
 version: 4.8.4rc1
 time: 2025/01/20 10:00
 author: Alexandru Cheltuitor

@@ -52,6 +52,7 @@ class VPNConnectionStatusWidget(Gtk.Box):
         self._port_forward_label = Gtk.Label(label="")
         self._connection_status_label = Gtk.Label(label="")
         self._connection_status_label.set_name("connection-status-label")
+        self._loading_widget = self._build_loading_connection_widget()
 
         self.pack_start(self._connection_status_label, expand=False, fill=False, padding=0)
 
@@ -64,12 +65,12 @@ class VPNConnectionStatusWidget(Gtk.Box):
         else:
             self._port_forward_revealer = None
 
-    def _generate_loading_connection_widget(self, server_name: str) -> Gtk.Widget:
+    def _build_loading_connection_widget(self) -> LoadingConnectionWidget:
         cancel_button = Gtk.Button.new_with_label("Cancel Connection")
         cancel_button.connect("clicked", self._on_cancel_button_clicked)
 
         loading_widget = LoadingConnectionWidget(
-            label=f"Connecting to {server_name}",
+            label="",
             cancel_button=cancel_button
         )
 
@@ -97,9 +98,8 @@ class VPNConnectionStatusWidget(Gtk.Box):
             label = "You are disconnected"
             self._overlay_widget.hide()
         elif isinstance(connection_state, states.Connecting):
-            self._overlay_widget.show(
-                self._generate_loading_connection_widget(connection.server_name)
-            )
+            self._loading_widget.set_label(f"Connecting to {connection.server_name}")
+            self._overlay_widget.show(self._loading_widget)
         elif isinstance(connection_state, states.Connected):
             label = f"You are connected to {connection.server_name}"
             self._overlay_widget.hide()

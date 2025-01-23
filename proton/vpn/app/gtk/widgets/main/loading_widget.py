@@ -89,8 +89,12 @@ class LoadingConnectionWidget(BaseLoadingContainerWidget):
         self.pack_start(self._cancel_button, expand=False, fill=False, padding=0)
 
     def get_label(self) -> str:
-        """Returns the label of the object"""
+        """Returns the label shown while the connection is being established."""
         return self._label.get_label()
+
+    def set_label(self, label: str):
+        """Sets the label shown while the connection is being established."""
+        return self._label.set_label(label)
 
 
 class OverlayWidget(Gtk.Box):
@@ -123,6 +127,6 @@ class OverlayWidget(Gtk.Box):
         # https://lazka.github.io/pgi-docs/Gtk-3.0/classes/Container.html#Gtk.Container.remove
         children = self._centered_container.get_children()
         if children:
-            children[0].destroy()
+            self._centered_container.remove(children[0])
 
         super().hide()

@@ -192,6 +192,7 @@ class Controller:  # pylint: disable=too-many-public-methods, too-many-instance-
         :return: A Future object that resolves once the connection reaches the
         "connected" state.
         """
+        # FIXME: getting the fastest server takes too long  # pylint: disable=fixme
         server = self._api.server_list.get_fastest()
         return self._connect_to_vpn(server)
 

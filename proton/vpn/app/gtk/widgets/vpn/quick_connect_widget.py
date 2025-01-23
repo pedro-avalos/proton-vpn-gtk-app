@@ -20,7 +20,7 @@ You should have received a copy of the GNU General Public License
 along with ProtonVPN.  If not, see <https://www.gnu.org/licenses/>.
 """
 from gi.repository import GLib
-from proton.vpn.connection.states import State
+from proton.vpn.connection import states
 
 from proton.vpn.app.gtk import Gtk
 from proton.vpn.app.gtk.controller import Controller
@@ -34,7 +34,7 @@ class QuickConnectWidget(Gtk.Box):
     def __init__(self, controller: Controller):
         super().__init__(spacing=10)
         self._controller = controller
-        self._connection_state: State = None
+        self._connection_state: states.State = None
 
         self.set_orientation(Gtk.Orientation.VERTICAL)
         self.connect_button = Gtk.Button(label="Quick Connect")
@@ -56,15 +56,23 @@ class QuickConnectWidget(Gtk.Box):
         return self._connection_state
 
     @connection_state.setter
-    def connection_state(self, connection_state: State):
+    def connection_state(self, connection_state: states.State):
         """Sets the current connection state, updating the UI accordingly."""
         # pylint: disable=duplicate-code
         self._connection_state = connection_state
 
         # Update the UI according to the connection state.
-        method = f"_on_connection_state_{type(connection_state).__name__.lower()}"
-        if hasattr(self, method):
-            getattr(self, method)()
+        if isinstance(connection_state, states.Disconnected) \
+                and not connection_state.context.reconnection:
+            self._on_connection_state_disconnected()
+        elif isinstance(connection_state, states.Connecting):
+            self._on_connection_state_connecting()
+        elif isinstance(connection_state, states.Connected):
+            self._on_connection_state_connected()
+        elif isinstance(connection_state, states.Disconnecting):
+            self._on_connection_state_disconnecting()
+        elif isinstance(connection_state, states.Error):
+            self._on_connection_state_error()
 
     def connection_status_update(self, connection_state):
         """This method is called by VPNWidget whenever the VPN connection status changes."""
