@@ -22,8 +22,10 @@ along with ProtonVPN.  If not, see <https://www.gnu.org/licenses/>.
 from dataclasses import dataclass
 from typing import Optional, Callable, List
 
-from gi.repository import GLib
+from gi.repository import GLib, Notify
+
 from proton.vpn.app.gtk import Gtk
+from proton.vpn.app.gtk.assets.icons import ICONS_PATH
 from proton.vpn.app.gtk.utils.glib import run_once
 from proton.vpn.app.gtk.widgets.main.notification_bar import NotificationBar
 
@@ -45,6 +47,7 @@ class Notifications:
         self._main_window = main_window
         self.notification_bar = notification_bar
         self.error_dialog = None
+        Notify.init("Proton VPN")
 
     def show_error_dialog(
             self, message: str, title: str, hint: Optional[str] = None,
@@ -116,3 +119,10 @@ class Notifications:
         GLib.idle_add(
             self.notification_bar.clear
         )
+
+    def show_gnome_notification(self, title: str, description: str):
+        """Shows a gnome desktop notification."""
+        Notify.Notification.new(
+            title, description,
+            str(ICONS_PATH / "proton-vpn-sign.svg")
+        ).show()

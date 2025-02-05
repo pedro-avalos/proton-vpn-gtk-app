@@ -25,12 +25,14 @@ from gi.repository import Gdk, GObject
 from proton.vpn.app.gtk import Gtk
 from proton.vpn.connection import states
 
+from proton.vpn.app.gtk.widgets.main.notifications import Notifications
+
 
 class PortForwardRevealer(Gtk.Revealer):  # pylint: disable=too-few-public-methods
     """The container that has all PF widgets and reveals on demand."""
-    def __init__(self, port_forward_widget: PortForwardWidget = None):
+    def __init__(self, notifications: Notifications, port_forward_widget: PortForwardWidget = None):
         super().__init__()
-        self._port_forward_widget = port_forward_widget or PortForwardWidget()
+        self._port_forward_widget = port_forward_widget or PortForwardWidget(notifications)
         self.add(self._port_forward_widget)
         self._port_forward_widget.connect(
             "update-visibility", self._on_update_port_forwarding_visibility
@@ -49,10 +51,15 @@ class PortForwardWidget(Gtk.EventBox):
     ACTIVE_PORT_LABEL = "Active port:"
     TOOLTIP_LABEL = "Copy port number"
 
-    def __init__(self, clipboard: Gtk.Clipboard = None):
+    def __init__(
+            self, notifications: Notifications, clipboard: Gtk.Clipboard = None,
+            forwarded_port: Optional[int] = None
+    ):
         super().__init__()
         self.set_name("port-forwarding-widget")
+        self._notifications = notifications
         self._clipboard = clipboard or Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        self._forwarded_port = forwarded_port
         self._port_forward_label = None
         self._build_ui()
 
@@ -138,6 +145,15 @@ class PortForwardWidget(Gtk.EventBox):
             connection_state.forwarded_port,
             reveal_child=isinstance(connection_state, states.Connected)
         )
+
+        new_port = connection_state.forwarded_port
+        if new_port and new_port != self._forwarded_port:
+            self._notifications.show_gnome_notification(
+                title="Port forwarding",
+                description=f"Active port: {connection_state.forwarded_port}"
+            )
+
+        self._forwarded_port = new_port
 
     def _update_visibility(self, forwarded_port: Optional[int], reveal_child: bool):
         if forwarded_port is None:

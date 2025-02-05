@@ -19,7 +19,7 @@ along with ProtonVPN.  If not, see <https://www.gnu.org/licenses/>.
 import pytest
 from unittest.mock import Mock, patch, PropertyMock
 from proton.vpn.app.gtk.widgets.vpn.port_forward_widget import PortForwardRevealer, PortForwardWidget
-from proton.vpn.connection import states
+from proton.vpn.connection import states, events
 
 
 class TestPortForwardRevealer:
@@ -30,7 +30,7 @@ class TestPortForwardRevealer:
     def test_revealer_updates_child_reveal_state_when_passing_new_value(self, set_reveal_child_mock, _, new_reveal_value):
         port_forward_widget_mock = Mock(name="PortForwardWidget")
         PortForwardRevealer(
-            port_forward_widget=port_forward_widget_mock
+            port_forward_widget=port_forward_widget_mock, notifications=Mock()
         )
         on_update_port_forwarding_visibility_callback = port_forward_widget_mock.connect.call_args[0][1]
         on_update_port_forwarding_visibility_callback(port_forward_widget_mock, new_reveal_value)
@@ -42,7 +42,7 @@ class TestPortForwardRevealer:
         connected_state = states.Connected()
         port_forward_widget_mock = Mock(name="PortForwardWidget")
         pfrevealer = PortForwardRevealer(
-            port_forward_widget=port_forward_widget_mock
+            port_forward_widget=port_forward_widget_mock, notifications=Mock()
         )
 
         pfrevealer.on_new_state(connected_state)
@@ -68,19 +68,73 @@ class TestPortForwardWidget:
     def test_on_new_state_widget_visibility_is_updated_accordingly_when_a_new_state_is_received(
         self, emit_mock, forwarded_port_mock, new_state, port_value, is_widget_visible
     ):
-        clipboard_mock = Mock(name="clipboard")
-        pfwidget = PortForwardWidget(clipboard=clipboard_mock)
+        pfwidget = PortForwardWidget(notifications=Mock(), clipboard=Mock())
         forwarded_port_mock.return_value = port_value
         pfwidget.on_new_state(new_state)
 
         emit_mock.assert_called_once_with("update-visibility", is_widget_visible)
 
+    def test_on_new_state_shows_port_forwarding_notification_if_port_changed(self):
+        notifications_mock = Mock()
+        pfwidget = PortForwardWidget(
+            notifications=notifications_mock,
+            clipboard=Mock(),
+            forwarded_port=None
+        )
+
+        active_port = 1234
+        new_state = states.Connected(states.StateContext(
+            event=events.Connected(events.EventContext(
+                connection=Mock(),
+                forwarded_port=active_port
+            ))
+        ))
+        pfwidget.on_new_state(new_state)
+
+        notifications_mock.show_gnome_notification.assert_called_once_with(
+            title="Port forwarding",
+            description=f"Active port: {active_port}"
+        )
+
+    def test_on_new_state_does_not_show_port_forwarding_notification_if_port_did_not_change(self):
+        notifications_mock = Mock()
+        active_port = 1234
+        pfwidget = PortForwardWidget(
+            notifications=notifications_mock,
+            clipboard=Mock(),
+            forwarded_port=active_port
+        )
+
+        new_state = states.Connected(states.StateContext(
+            event=events.Connected(events.EventContext(
+                connection=Mock(),
+                forwarded_port=active_port
+            ))
+        ))
+        pfwidget.on_new_state(new_state)
+
+        notifications_mock.show_gnome_notification.assert_not_called()
+
+    def test_on_new_state_does_not_show_port_forwarding_notification_if_new_state_has_no_port(self):
+        notifications_mock = Mock()
+        pfwidget = PortForwardWidget(notifications=notifications_mock, clipboard=Mock(), forwarded_port=1234)
+        new_state = states.Connected(states.StateContext(
+            event=events.Connected(events.EventContext(
+                connection=Mock(),
+                forwarded_port=None
+            ))
+        ))
+
+        pfwidget.on_new_state(new_state)
+
+        notifications_mock.show_gnome_notification.assert_not_called()
+
     @patch("proton.vpn.app.gtk.widgets.vpn.port_forward_widget.PortForwardWidget.connect")
     def test_on_button_press_ensure_port_is_copied_to_clipboard(self, connect_mock):
         port = 443
         number_of_bytes_in_the_string = len(str(port).encode("utf-8"))
-        clipboard_mock = Mock(name="clipboard")
-        pfwidget = PortForwardWidget(clipboard=clipboard_mock)
+        clipboard_mock = Mock()
+        pfwidget = PortForwardWidget(notifications=Mock(), clipboard=clipboard_mock)
         pfwidget.set_port_forward_label(port)
 
         on_button_press_callback = connect_mock.call_args_list[0][0][1]

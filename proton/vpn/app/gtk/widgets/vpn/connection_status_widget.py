@@ -60,7 +60,7 @@ class VPNConnectionStatusWidget(Gtk.Box):
 
         if env_variable in ("true", "1", "t"):
             self._port_forward_revealer = port_forward_revealer \
-                or PortForwardRevealer()
+                or PortForwardRevealer(notifications)
             self.pack_start(self._port_forward_revealer, expand=False, fill=False, padding=0)
         else:
             self._port_forward_revealer = None
