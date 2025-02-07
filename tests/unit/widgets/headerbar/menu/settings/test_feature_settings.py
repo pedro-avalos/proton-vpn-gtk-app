@@ -31,6 +31,17 @@ KILLSWITCH_STANDARD = 1
 KILLSWITCH_ADVANCED = 2
 
 
+def _get_expected_description(new_value, feature_flag_enabled, fs):
+    expected_description_value = fs.PORT_FORWARDING_DESCRIPTION
+    if new_value:
+        expected_description_value = fs.PORT_FORWARDING_SETUP_GUIDE
+        if feature_flag_enabled:
+            expected_description_value =\
+                fs.PORT_FORWARDING_DESCRIPTION_LEARN_MORE
+
+    return expected_description_value
+
+
 @patch("proton.vpn.app.gtk.widgets.headerbar.menu.settings.feature_settings.FeatureSettings.pack_start")
 @patch("proton.vpn.app.gtk.widgets.headerbar.menu.settings.feature_settings.ComboboxWidget")
 def test_build_moderate_nat_save_new_value_when_callback_is_called(combobox_widget_mock, _):
@@ -63,7 +74,8 @@ def test_build_port_forwarding_updates_description_when_being_initialized_if_ena
     fs.build_port_forwarding()
 
     if enabled:
-        toggle_mock.description.set_label.assert_called_once_with(fs.PORT_FORWARDING_SETUP_GUIDE)
+        toggle_mock.description.set_label.assert_called_once_with(
+            _get_expected_description(enabled, True, fs))
     else:
         toggle_mock.description.set_label.assert_not_called()
 
@@ -90,7 +102,7 @@ def test_build_port_forwarding_save_new_value_when_callback_is_called(toggle_wid
     toggle_widget_mock.save_setting.assert_called_once_with(new_value)
 
     toggle_widget_mock.description.set_label.assert_called_once_with(
-        fs.PORT_FORWARDING_SETUP_GUIDE if new_value and not feature_flag_enabled else fs.PORT_FORWARDING_DESCRIPTION 
+        _get_expected_description(new_value, feature_flag_enabled, fs)
     )
     settings_window_mock.notify_user_with_reconnect_message.assert_called_once()
 

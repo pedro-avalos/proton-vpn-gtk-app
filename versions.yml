@@ -1,3 +1,12 @@
+version: 4.8.4rc4
+time: 2025/02/07 14:40
+author: Luke Titley
+email: luke.titley@proton.ch
+urgency: low
+stability: unstable
+description:
+- Switch DisplayPortForwarding env var to Feature Flag
+---
 version: 4.8.4rc3
 time: 2025/02/03 17:14
 author: Josep Llaneras
