@@ -30,9 +30,12 @@ from proton.vpn.app.gtk.widgets.main.notifications import Notifications
 
 class PortForwardRevealer(Gtk.Revealer):  # pylint: disable=too-few-public-methods
     """The container that has all PF widgets and reveals on demand."""
-    def __init__(self, notifications: Notifications, port_forward_widget: PortForwardWidget = None):
+    def __init__(self,
+                 notifications: Notifications,
+                 port_forward_widget: PortForwardWidget = None):
         super().__init__()
-        self._port_forward_widget = port_forward_widget or PortForwardWidget(notifications)
+        self._port_forward_widget = \
+            port_forward_widget or PortForwardWidget(notifications)
         self.add(self._port_forward_widget)
         self._port_forward_widget.connect(
             "update-visibility", self._on_update_port_forwarding_visibility
@@ -59,7 +62,7 @@ class PortForwardWidget(Gtk.EventBox):
         self.set_name("port-forwarding-widget")
         self._notifications = notifications
         self._clipboard = clipboard or Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
-        self._forwarded_port = forwarded_port
+        self._current_forwarded_port = forwarded_port
         self._port_forward_label = None
         self._build_ui()
 
@@ -140,20 +143,30 @@ class PortForwardWidget(Gtk.EventBox):
 
     def on_new_state(self, connection_state: states.State):
         """Receives new connection state and emits a signal
-        of wether it should be hidden or not."""
+        of whether it should be hidden or not."""
         self._update_visibility(
             connection_state.forwarded_port,
             reveal_child=isinstance(connection_state, states.Connected)
         )
 
-        new_port = connection_state.forwarded_port
-        if new_port and new_port != self._forwarded_port:
-            self._notifications.show_gnome_notification(
-                title="Port forwarding",
-                description=f"Active port: {connection_state.forwarded_port}"
-            )
+        top_level = self._port_forward_label.get_toplevel()
+        is_focus = True
 
-        self._forwarded_port = new_port
+        # This check is for testing purposes.
+        # When testing we can have a PortForwardWidget that is not part of a
+        # top level window.
+        if top_level != self:
+            is_focus = top_level.is_active()
+
+        new_port = connection_state.forwarded_port
+        if new_port and (new_port != self._current_forwarded_port):
+            if not is_focus:
+                self._notifications.show_gnome_notification(
+                    title="Port forwarding",
+                    description=f"Active port changed to {new_port}"
+                )
+
+        self._current_forwarded_port = new_port
 
     def _update_visibility(self, forwarded_port: Optional[int], reveal_child: bool):
         if forwarded_port is None:

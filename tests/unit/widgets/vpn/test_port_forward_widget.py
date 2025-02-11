@@ -22,6 +22,14 @@ from proton.vpn.app.gtk.widgets.vpn.port_forward_widget import PortForwardReveal
 from proton.vpn.connection import states, events
 
 
+def _make_state(active_port):
+    return states.Connected(states.StateContext(
+        event=events.Connected(events.EventContext(
+            connection=Mock(),
+            forwarded_port=active_port
+        ))
+    ))
+
 class TestPortForwardRevealer:
 
     @pytest.mark.parametrize("new_reveal_value", [True, False])
@@ -82,38 +90,47 @@ class TestPortForwardWidget:
             forwarded_port=None
         )
 
+        # Patch get_toplevel to return a hidden window
+        # so that the notification is shown.
+        pfwidget._port_forward_label.get_toplevel = Mock(
+            return_value=Mock(is_active=Mock(return_value=False))
+        )
+
+        # We expect a notification the first time.
         active_port = 1234
-        new_state = states.Connected(states.StateContext(
-            event=events.Connected(events.EventContext(
-                connection=Mock(),
-                forwarded_port=active_port
-            ))
-        ))
-        pfwidget.on_new_state(new_state)
+        pfwidget.on_new_state(_make_state(active_port=active_port))
 
         notifications_mock.show_gnome_notification.assert_called_once_with(
             title="Port forwarding",
-            description=f"Active port: {active_port}"
+            description=f"Active port changed to {active_port}"
         )
+
+        # And we expect a notification when the port changes.
+        pfwidget.on_new_state(_make_state(active_port=5678))
+
+        notifications_mock.show_gnome_notification.assert_called()
 
     def test_on_new_state_does_not_show_port_forwarding_notification_if_port_did_not_change(self):
         notifications_mock = Mock()
-        active_port = 1234
+
         pfwidget = PortForwardWidget(
             notifications=notifications_mock,
             clipboard=Mock(),
-            forwarded_port=active_port
+            forwarded_port=None
         )
 
-        new_state = states.Connected(states.StateContext(
-            event=events.Connected(events.EventContext(
-                connection=Mock(),
-                forwarded_port=active_port
-            ))
-        ))
-        pfwidget.on_new_state(new_state)
+        # Patch get_toplevel to return a hidden window
+        # so that the notification is shown if it should be.
+        pfwidget._port_forward_label.get_toplevel = Mock(
+            return_value=Mock(is_active=Mock(return_value=False))
+        )
 
-        notifications_mock.show_gnome_notification.assert_not_called()
+        # Two state changes with the same port should not trigger a
+        # notification.
+        pfwidget.on_new_state(_make_state(active_port=1234))
+        pfwidget.on_new_state(_make_state(active_port=1234))
+
+        notifications_mock.show_gnome_notification.assert_called_once()
 
     def test_on_new_state_does_not_show_port_forwarding_notification_if_new_state_has_no_port(self):
         notifications_mock = Mock()
