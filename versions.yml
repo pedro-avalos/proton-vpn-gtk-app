@@ -1,3 +1,12 @@
+version: 4.9.1
+time: 2025/02/14 09:00
+author: Luke Titley
+email: luke.titley@proton.ch
+urgency: low
+stability: unstable
+description:
+- Fix to beta version suffix in beta release.
+---
 version: 4.9.0
 time: 2025/02/13 09:00
 author: Luke Titley
