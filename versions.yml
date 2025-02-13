@@ -1,38 +1,14 @@
-version: 4.8.4rc4
-time: 2025/02/07 14:40
+version: 4.9.0
+time: 2025/02/13 09:00
 author: Luke Titley
 email: luke.titley@proton.ch
 urgency: low
 stability: unstable
 description:
 - Switch DisplayPortForwarding env var to Feature Flag
----
-version: 4.8.4rc3
-time: 2025/02/03 17:14
-author: Josep Llaneras
-email: josep.llaneras@proton.ch
-urgency: low
-stability: unstable
-description:
-- Show port forwarding desktop notification.
----
-version: 4.8.4rc2
-time: 2025/01/23 10:08
-author: Josep Llaneras
-email: josep.llaneras@proton.ch
-urgency: low
-stability: unstable
-description:
-- Fix cancel connection.
----
-version: 4.8.4rc1
-time: 2025/01/20 10:00
-author: Alexandru Cheltuitor
-email: alexandru.cheltuitor@proton.ch
-urgency: low
-stability: unstable
-description:
-- Remove save_setting when building UI when a feature requires upgrade.
+- Show port forwarding desktop notification (Josep Llaneras)
+- Fix cancel connection (Josep Llaneras).
+- Remove save_setting when building UI when a feature requires upgrade (Alexandru Cheltuitor)
 ---
 version: 4.8.3
 time: 2025/01/20 10:00
@@ -51,7 +27,7 @@ time: 2024/12/18 12:00
 author: Alexandru Cheltuitor
 email: alexandru.cheltuitor@proton.ch
 urgency: low
-stability: low
+stability: unstable
 description:
 - Display port forwarding UI if environment variable is set (Alexandru Cheltuitor).
 - Ensure app does not crash when attempting to logout after doing a search (Alexandru Cheltuitor).
@@ -62,7 +38,7 @@ time: 2024/12/05 10:00
 author: Josep Llaneras
 email: josep.llaneras@proton.ch
 urgency: low
-stability: low
+stability: unstable
 description:
 - Update release package version used for beta toggle
 ---

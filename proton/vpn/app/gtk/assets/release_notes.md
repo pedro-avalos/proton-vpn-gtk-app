@@ -1,3 +1,7 @@
+## 4.9.0
+- This update introduces automated port forwarding. Users can now enable port forwarding, connect to supported servers, and use assigned ports without manual scripting.
+- We fixed an issue that caused VPN to reconnect after cancelling connection.
+
 ## 4.8.3
 - Introduced load percentages in server search results, see server loads at a glance.
 - Minor packaging improvements.
