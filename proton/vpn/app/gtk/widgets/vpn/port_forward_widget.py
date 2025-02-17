@@ -163,7 +163,7 @@ class PortForwardWidget(Gtk.EventBox):
             if not is_focus:
                 self._notifications.show_gnome_notification(
                     title="Port forwarding",
-                    description=f"Active port changed to {new_port}"
+                    description=f"Active port is {new_port}"
                 )
 
         self._current_forwarded_port = new_port

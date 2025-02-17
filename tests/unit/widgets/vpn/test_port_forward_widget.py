@@ -102,7 +102,7 @@ class TestPortForwardWidget:
 
         notifications_mock.show_gnome_notification.assert_called_once_with(
             title="Port forwarding",
-            description=f"Active port changed to {active_port}"
+            description=f"Active port is {active_port}"
         )
 
         # And we expect a notification when the port changes.

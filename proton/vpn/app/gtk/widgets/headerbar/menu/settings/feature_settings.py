@@ -167,7 +167,7 @@ class FeatureSettings(BaseCategoryContainer):  # pylint: disable=too-many-instan
         "and devices on your local network."
     PORT_FORWARDING_DESCRIPTION_LEARN_MORE = "Bypass firewalls to connect to P2P servers "\
         "and devices on your local network. "\
-        "<a href=\"https://protonvpn.com/support/port-forwarding/#linux\">Learn more.</a>"
+        "<a href=\"https://protonvpn.com/support/port-forwarding/#linux\">Learn more</a>"
     PORT_FORWARDING_SETUP_GUIDE = "Follow our "\
         "<a href=\"https://protonvpn.com/support/port-forwarding-manual-setup/"\
         "#how-to-use-port-forwarding\">guide</a>"\
