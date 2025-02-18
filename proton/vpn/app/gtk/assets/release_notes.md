@@ -1,3 +1,6 @@
+## 4.9.3
+- This version includes minor bug fixes.
+
 ## 4.9.1
 - This version includes minor bug fixes.
 

@@ -1,20 +1,12 @@
-version: 4.9.3rc2
+version: 4.9.3
 time: 2025/02/17 16:17
 author: Luke Titley
 email: luke.titley@proton.ch
 urgency: low
 stability: unstable
 description:
-- Minor changes to wording of port forwarding user interface
----
-version: 4.9.3rc1
-time: 2025/02/17 15:01
-author: Pep Llaneras
-email: josep.llaneras@proton.ch
-urgency: low
-stability: unstable
-description:
-- Update api-core dependency
+- Minor changes to wording of port forwarding user interface (Luke Titley)
+- Update api-core dependency (Pep Llaneras)
 ---
 version: 4.9.2
 time: 2025/02/14 14:49
