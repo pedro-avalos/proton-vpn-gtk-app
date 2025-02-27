@@ -20,6 +20,7 @@ import pytest
 from unittest.mock import Mock, patch, PropertyMock
 from proton.vpn.app.gtk.widgets.vpn.port_forward_widget import PortForwardRevealer, PortForwardWidget
 from proton.vpn.connection import states, events
+from gi.repository import Gtk  # pylint: disable=C0413 # noqa: E402
 
 
 def _make_state(active_port):
@@ -29,6 +30,7 @@ def _make_state(active_port):
             forwarded_port=active_port
         ))
     ))
+
 
 class TestPortForwardRevealer:
 
@@ -93,7 +95,7 @@ class TestPortForwardWidget:
         # Patch get_toplevel to return a hidden window
         # so that the notification is shown.
         pfwidget._port_forward_label.get_toplevel = Mock(
-            return_value=Mock(is_active=Mock(return_value=False))
+            return_value=Mock(is_active=Mock(return_value=False), spec=Gtk.Window)
         )
 
         # We expect a notification the first time.
@@ -122,7 +124,7 @@ class TestPortForwardWidget:
         # Patch get_toplevel to return a hidden window
         # so that the notification is shown if it should be.
         pfwidget._port_forward_label.get_toplevel = Mock(
-            return_value=Mock(is_active=Mock(return_value=False))
+            return_value=Mock(is_active=Mock(return_value=False), spec=Gtk.Window)
         )
 
         # Two state changes with the same port should not trigger a

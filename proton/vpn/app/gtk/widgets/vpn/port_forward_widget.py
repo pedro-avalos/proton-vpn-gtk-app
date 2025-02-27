@@ -152,10 +152,10 @@ class PortForwardWidget(Gtk.EventBox):
         top_level = self._port_forward_label.get_toplevel()
         is_focus = True
 
-        # This check is for testing purposes.
-        # When testing we can have a PortForwardWidget that is not part of a
-        # top level window.
-        if top_level != self:
+        # We need to check that the top level widget is indeed the main window
+        # because when shutting down the app this widget could process events
+        # after the main window is already closed.
+        if isinstance(top_level, Gtk.Window):
             is_focus = top_level.is_active()
 
         new_port = connection_state.forwarded_port
