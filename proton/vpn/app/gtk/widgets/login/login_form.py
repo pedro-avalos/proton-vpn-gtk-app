@@ -277,7 +277,7 @@ class LoginLinks(Gtk.Box):
         super().__init__(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
         create_account_link = Gtk.LinkButton(
             label="Create Account",
-            uri="https://account.protonvpn.com/signup"
+            uri="https://account.protonvpn.com/signup?ref=linux"
         )
         self.pack_start(
             create_account_link, expand=False, fill=False, padding=0
