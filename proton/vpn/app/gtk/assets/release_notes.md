@@ -1,3 +1,6 @@
+## 4.9.5
+- Improved application logging.
+
 ## 4.9.4
 - This version includes minor bug fixes.
 
