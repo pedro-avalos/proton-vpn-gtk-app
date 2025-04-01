@@ -1,3 +1,12 @@
+version: 4.9.6rc1
+time: 2025/04/01 13:00
+author: Alexandru Cheltuitor
+email: alexandru.cheltuitor@proton.ch
+urgency: low
+stability: unstable
+description:
+- Add missing dependency for libnotify.
+---
 version: 4.9.5
 time: 2025/03/06 10:57
 author: Pep Llaneras
