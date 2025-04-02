@@ -1,19 +1,11 @@
-version: 4.9.6rc2
-time: 2025/04/01 13:00
+version: 4.9.6
+time: 2025/04/02 09:00
 author: Alexandru Cheltuitor
 email: alexandru.cheltuitor@proton.ch
 urgency: low
 stability: unstable
 description:
 - Replace direct binary usage for macro in .spec file.
----
-version: 4.9.6rc1
-time: 2025/04/01 13:00
-author: Alexandru Cheltuitor
-email: alexandru.cheltuitor@proton.ch
-urgency: low
-stability: unstable
-description:
 - Add missing dependency for libnotify.
 ---
 version: 4.9.5

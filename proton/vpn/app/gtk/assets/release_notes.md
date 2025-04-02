@@ -1,3 +1,6 @@
+## 4.9.6
+- Bug fixes and stability improvements.
+
 ## 4.9.5
 - Improved application logging.
 
