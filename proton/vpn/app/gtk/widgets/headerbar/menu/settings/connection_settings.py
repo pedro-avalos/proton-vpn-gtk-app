@@ -86,7 +86,6 @@ class ConnectionSettings(BaseCategoryContainer):  # pylint: disable=too-many-ins
         """Builds and adds the `vpn_accelerator` setting to the widget."""
         def on_switch_state(_, new_value: bool, toggle_widget: ToggleWidget):
             toggle_widget.save_setting(new_value)
-            self._settings_window.notify_user_with_reconnect_message()
 
         self.pack_start(ToggleWidget(
             controller=self._controller,
@@ -101,7 +100,6 @@ class ConnectionSettings(BaseCategoryContainer):  # pylint: disable=too-many-ins
         """Builds and adds the `moderate_nat` setting to the widget."""
         def on_switch_state(_, new_value: bool, toggle_widget: ToggleWidget):
             toggle_widget.save_setting(new_value)
-            self._settings_window.notify_user_with_reconnect_message()
 
         self.pack_start(ToggleWidget(
             controller=self._controller,

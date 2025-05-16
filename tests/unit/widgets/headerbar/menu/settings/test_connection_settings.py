@@ -42,7 +42,7 @@ def test_build_vpn_accelerator_save_new_value_when_callback_is_called(toggle_wid
     callback(None, new_value, toggle_widget_mock)
 
     toggle_widget_mock.save_setting.assert_called_once_with(new_value)
-    settings_window_mock.notify_user_with_reconnect_message.assert_called_once()
+    settings_window_mock.notify_user_with_reconnect_message.assert_not_called()
 
 
 @patch("proton.vpn.app.gtk.widgets.headerbar.menu.settings.connection_settings.ConnectionSettings.pack_start")
@@ -61,7 +61,7 @@ def test_build_moderate_nat_save_new_value_when_callback_is_called(toggle_widget
     callback(None, new_value, toggle_widget_mock)
 
     toggle_widget_mock.save_setting.assert_called_once_with(new_value)
-    settings_window_mock.notify_user_with_reconnect_message.assert_called_once()
+    settings_window_mock.notify_user_with_reconnect_message.assert_not_called()
 
 
 @patch("proton.vpn.app.gtk.widgets.headerbar.menu.settings.connection_settings.ConnectionSettings.pack_start")

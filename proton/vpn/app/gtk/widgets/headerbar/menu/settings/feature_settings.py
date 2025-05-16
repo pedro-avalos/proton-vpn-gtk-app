@@ -199,7 +199,6 @@ class FeatureSettings(BaseCategoryContainer):  # pylint: disable=too-many-instan
             treeiter = combobox.get_active_iter()
             netshield = int(model[treeiter][1])
             combobox_widget.save_setting(netshield)
-            self._settings_window.notify_user_with_reconnect_message()
             self.emit("netshield-setting-changed", netshield)
 
         netshield_options = [
@@ -240,7 +239,6 @@ class FeatureSettings(BaseCategoryContainer):  # pylint: disable=too-many-instan
 
             toggle_widget.save_setting(enabled)
             toggle_widget.description.set_label(description_value)
-            self._settings_window.notify_user_with_reconnect_message()
 
         port_forwarding_widget = ToggleWidget(
             controller=self._controller,

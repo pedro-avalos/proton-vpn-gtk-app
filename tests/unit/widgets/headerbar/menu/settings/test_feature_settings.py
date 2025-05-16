@@ -59,7 +59,7 @@ def test_build_moderate_nat_save_new_value_when_callback_is_called(combobox_widg
 
     callback(gtk_combobox_widget_mock, combobox_widget_mock)
     combobox_widget_mock.save_setting.assert_called_once_with(int(new_value))
-    settings_window_mock.notify_user_with_reconnect_message.assert_called_once()
+    settings_window_mock.notify_user_with_reconnect_message.assert_not_called()
 
 
 @pytest.mark.parametrize("enabled", [False, True])
@@ -104,7 +104,7 @@ def test_build_port_forwarding_save_new_value_when_callback_is_called(toggle_wid
     toggle_widget_mock.description.set_label.assert_called_once_with(
         _get_expected_description(new_value, feature_flag_enabled, fs)
     )
-    settings_window_mock.notify_user_with_reconnect_message.assert_called_once()
+    settings_window_mock.notify_user_with_reconnect_message.assert_not_called()
 
 
 class TestKillSwitchWidget:
