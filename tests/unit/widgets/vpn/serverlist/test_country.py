@@ -124,6 +124,28 @@ def test_country_row_updates_server_rows_on_connection_status_update(
     assert country_row.server_rows[0].connection_state == connection_state.type
 
 
+def test_connection_status_update_resets_country_row_connected_server_on_disconnect(
+        country, mock_controller
+):
+    mock_controller.is_connection_active = False
+    # providing a connected server id tells the country row that we're connected to this server
+    country_row = DeferredCountryRow(
+            country=country, user_tier=PLUS_TIER, controller=mock_controller, connected_server_id=country.servers[0].id)
+
+    # disconnect event before country row's servers are loaded
+    connection_state = Disconnected()
+    connection_state.context = Mock()
+    connection_state.context.connection.server_id = country.servers[0].id
+    country_row.connection_status_update(connection_state)
+
+    # trigger country row load
+    country_row.click_toggle_country_servers_button()
+    process_gtk_events()
+
+    # assert that the previously-connected-to server row is no longer considered to be connected
+    assert country_row.server_rows[0].connection_state != ConnectionStateEnum.CONNECTED
+
+
 def test_connect_button_click_triggers_vpn_connection_to_country(country, mock_controller):
     country_row = DeferredCountryRow(country=country, user_tier=PLUS_TIER, controller=mock_controller)
 
