@@ -35,11 +35,15 @@ from proton.vpn.app.gtk.widgets.headerbar.menu.settings.common import ToggleWidg
 
 logger = logging.getLogger(__name__)
 
+COMPATIBLE_DISTRIBUTIONS = distro.like().split(" ")
+COMPATIBLE_DISTRIBUTIONS.append(distro.id())
+
 
 @dataclass
 class DistroManager:  # pylint: disable=too-many-instance-attributes
-    """Hold data related to a specific distribution."""
-    name: str
+    """Holds data related to supported distributions grouped by package manager."""
+    names: list[str]
+    package_manager: str
     uninstall_repo_command: str
     install_repo_command: str
     update_local_index_command: str
@@ -75,7 +79,8 @@ class DistroManager:  # pylint: disable=too-many-instance-attributes
 
 
 DEBIAN_MANAGER = DistroManager(
-    name="apt",
+    names=["debian", "ubuntu"],
+    package_manager="apt",
     uninstall_repo_command="sudo apt -y purge",
     install_repo_command="sudo apt -y install",
     list_installed_packages_command="apt list --installed",
@@ -89,7 +94,8 @@ DEBIAN_MANAGER = DistroManager(
 )
 
 FEDORA_MANAGER = DistroManager(
-    name="dnf",
+    names=["fedora"],
+    package_manager="dnf",
     uninstall_repo_command="sudo dnf remove -y",
     install_repo_command="sudo dnf install -y",
     list_installed_packages_command="rpm -qa",
@@ -381,8 +387,10 @@ class EarlyAccessWidget(ToggleWidget):
 
     def _get_system_distro_manager(self) -> Optional[DistroManager]:
         for supported_distro_manager in self.SUPPORTED_DISTRO_MANAGERS:
-            if shutil.which(supported_distro_manager.name):
-                return supported_distro_manager
+            if shutil.which(supported_distro_manager.package_manager):
+                for supported_distro in supported_distro_manager.names:
+                    if any(dist in supported_distro for dist in COMPATIBLE_DISTRIBUTIONS):
+                        return supported_distro_manager
 
         return None
 

@@ -21,12 +21,14 @@ along with ProtonVPN.  If not, see <https://www.gnu.org/licenses/>.
 """
 from unittest.mock import patch, Mock, PropertyMock
 import pytest
+import proton.vpn.app.gtk.widgets.headerbar.menu.settings.early_access as early_access
 from proton.vpn.app.gtk.widgets.headerbar.menu.settings.early_access import DistroManager, EarlyAccessDialog, EarlyAccessWidget, ToggleWidget
 
 @pytest.fixture
 def early_access_raw_data():
     data = {
-        "name": "test-package-manager",
+        "names": ["test-first-supported-distro", "test-second-supported-distro"],
+        "package_manager": "test-package-manager",
         "uninstall_repo_command": "mock-uninstall-command",
         "install_repo_command": "mock-install-command",
         "update_local_index_command": "mock-update-local-index-command",
@@ -44,7 +46,8 @@ def early_access_raw_data():
 @pytest.fixture
 def distro_manager(early_access_raw_data):
     ea_data = DistroManager(
-        early_access_raw_data.get("name"),
+        early_access_raw_data.get("names"),
+        early_access_raw_data.get("package_manager"),
         early_access_raw_data.get("uninstall_repo_command"),
         early_access_raw_data.get("install_repo_command"),
         early_access_raw_data.get("update_local_index_command"),
@@ -64,7 +67,8 @@ class TestEarlyAccess:
 
     def test_dataclass_build_when_arguments_are_passed(self, early_access_raw_data):
         ea_data = DistroManager(
-            early_access_raw_data.get("name"),
+            early_access_raw_data.get("names"),
+            early_access_raw_data.get("package_manager"),
             early_access_raw_data.get("uninstall_repo_command"),
             early_access_raw_data.get("install_repo_command"),
             early_access_raw_data.get("update_local_index_command"),
@@ -120,32 +124,36 @@ class TestEarlyAccessWidget:
 
     @patch("proton.vpn.app.gtk.widgets.headerbar.menu.settings.early_access.EarlyAccessWidget._find_installed_repo_packages")
     @patch("proton.vpn.app.gtk.widgets.headerbar.menu.settings.early_access.shutil.which")
-    @patch("proton.vpn.app.gtk.widgets.headerbar.menu.settings.early_access.EarlyAccessWidget._get_system_distro_manager")
-    @pytest.mark.parametrize("which_return,installed_repo_packages,distro_manager,can_early_access_be_displayed", [
-        pytest.param(True, (True, False), Mock(), True),
-        pytest.param(True, (False, True), Mock(), True),
-        pytest.param(True, (True, True), Mock(), True),
-        pytest.param(False, (True, True), Mock(), False),
-        pytest.param(False, (False, True), Mock(), False),
-        pytest.param(False, (False, False), Mock(), False),
-        pytest.param(True, (False, False), Mock(), False),
-        pytest.param(True, (True, False), None, False),
-        pytest.param(True, (False, True), None, False),
+    @pytest.mark.parametrize("which_return,installed_repo_packages,compat_distros,can_early_access_be_displayed", [
+        pytest.param(True, (True, False), ["ubuntu", "debian"], True),
+        pytest.param(True, (False, True), ["debian"], True),
+        pytest.param(True, (True, True), ["fedora"], True),
+        pytest.param(False, (True, True), ["ubuntu", "debian"], False),     # package manager not found
+        pytest.param(False, (False, True), ["ubuntu", "debian"], False),    # package manager not found
+        pytest.param(False, (False, False), ["ubuntu", "debian"], False),   # package manager not found, stable and beta not installed
+        pytest.param(True, (False, False), ["ubuntu", "debian"], False),    # stable and beta not installed
+        pytest.param(True, (True, False), ["slackware"], False),            # unsupported distro
+        pytest.param(True, (False, True), ["gentoo"], False),               # unsupported distro
+        pytest.param(True, (False, True), ["opensuse", "sles"], False)      # unsupported distro
     ])
     def test_early_access_setting_is_displayed_only_when_system_requirements_are_met(
-        self, mock_get_system_distro_manager, mock_which, mock_find_installed_repo_packages, which_return, installed_repo_packages, distro_manager, can_early_access_be_displayed
+        self, mock_which, mock_find_installed_repo_packages, which_return, installed_repo_packages, compat_distros, can_early_access_be_displayed
     ):
         """This test ensures that that early access can be displayed when:
-        - `distro_manager` is not None, and
+        - `distro_manager` is set to a system compatible supported configuration
         - one of the repo packages are installed, and
         - `pkexec` bin is found
         """
-        mock_get_system_distro_manager.return_value = distro_manager
-        mock_which.return_value = which_return
-        mock_find_installed_repo_packages.return_value = installed_repo_packages
-        switch = EarlyAccessWidget(Mock(), distro_manager, Mock())
+        with patch.object (
+            early_access,
+            "COMPATIBLE_DISTRIBUTIONS",
+            compat_distros
+        ):
+            mock_which.return_value = which_return
+            mock_find_installed_repo_packages.return_value = installed_repo_packages
+            switch = EarlyAccessWidget(Mock(), None, Mock())
 
-        assert switch.can_early_access_be_displayed() == can_early_access_be_displayed
+            assert switch.can_early_access_be_displayed() == can_early_access_be_displayed
 
     @patch("proton.vpn.app.gtk.widgets.headerbar.menu.settings.early_access.EarlyAccessWidget.set_state")
     @pytest.mark.parametrize("early_access_enabled_value", [True, False])
