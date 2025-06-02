@@ -1,3 +1,12 @@
+version: 4.9.7rc5
+time: 2025/06/02 17:30
+author: Richard Paterson
+email: richard.paterson@proton.ch
+urgency: low
+stability: unstable
+description:
+- Update early access stable and beta packages
+---
 version: 4.9.7rc4
 time: 2025/05/28 18:15
 author: Richard Paterson

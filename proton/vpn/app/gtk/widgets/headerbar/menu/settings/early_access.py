@@ -85,9 +85,9 @@ DEBIAN_MANAGER = DistroManager(
     install_repo_command="sudo /usr/bin/apt -y install",
     list_installed_packages_command="/usr/bin/apt list --installed",
     stable_url="https://repo.protonvpn.com/debian/dists/stable/main/binary-all/"
-    "protonvpn-stable-release_1.0.6_all.deb",
+    "protonvpn-stable-release_1.0.8_all.deb",
     beta_url="https://repo.protonvpn.com/debian/dists/unstable/main/binary-all/"
-    "protonvpn-beta-release_1.0.6_all.deb",
+    "protonvpn-beta-release_1.0.8_all.deb",
     update_local_index_command="sudo /usr/bin/apt update",
     reinstall_app_command="sudo /usr/bin/apt autoremove -y proton-vpn-gnome-desktop "
     "&& sudo /usr/bin/apt install -y proton-vpn-gnome-desktop"
@@ -100,9 +100,9 @@ FEDORA_MANAGER = DistroManager(
     install_repo_command="sudo dnf install -y",
     list_installed_packages_command="rpm -qa",
     stable_url=f"https://repo.protonvpn.com/fedora-{distro.version()}-"
-    "stable/protonvpn-stable-release/protonvpn-stable-release-1.0.2-1.noarch.rpm",
+    "stable/protonvpn-stable-release/protonvpn-stable-release-1.0.3-1.noarch.rpm",
     beta_url=f"https://repo.protonvpn.com/fedora-{distro.version()}-"
-    "unstable/protonvpn-beta-release/protonvpn-beta-release-1.0.2-1.noarch.rpm",
+    "unstable/protonvpn-beta-release/protonvpn-beta-release-1.0.3-1.noarch.rpm",
     update_local_index_command="",
     reinstall_app_command="sudo dnf remove -y proton-vpn-gnome-desktop "
     "&& sudo dnf install -y proton-vpn-gnome-desktop"
