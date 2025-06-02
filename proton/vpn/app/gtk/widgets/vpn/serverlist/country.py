@@ -529,7 +529,7 @@ class DeferredCountryRow(Gtk.Box):  # pylint: disable=too-many-instance-attribut
             server.connection_state = connection_state.type
 
         # maintain connected server id only when connected
-        if self._controller.is_connection_active:
+        if self._controller.is_connection_active:  # noqa: E501 # pylint: disable=line-too-long # nosemgrep: python.lang.maintainability.is-function-without-parentheses.is-function-without-parentheses
             self._connected_server_id = server_id
         else:
             self._connected_server_id = None

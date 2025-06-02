@@ -80,17 +80,17 @@ class DistroManager:  # pylint: disable=too-many-instance-attributes
 
 DEBIAN_MANAGER = DistroManager(
     names=["debian", "ubuntu"],
-    package_manager="apt",
-    uninstall_repo_command="sudo apt -y purge",
-    install_repo_command="sudo apt -y install",
-    list_installed_packages_command="apt list --installed",
+    package_manager="/usr/bin/apt",
+    uninstall_repo_command="sudo /usr/bin/apt -y purge",
+    install_repo_command="sudo /usr/bin/apt -y install",
+    list_installed_packages_command="/usr/bin/apt list --installed",
     stable_url="https://repo.protonvpn.com/debian/dists/stable/main/binary-all/"
     "protonvpn-stable-release_1.0.6_all.deb",
     beta_url="https://repo.protonvpn.com/debian/dists/unstable/main/binary-all/"
     "protonvpn-beta-release_1.0.6_all.deb",
-    update_local_index_command="sudo apt update",
-    reinstall_app_command="sudo apt autoremove -y proton-vpn-gnome-desktop "
-    "&& sudo apt install -y proton-vpn-gnome-desktop"
+    update_local_index_command="sudo /usr/bin/apt update",
+    reinstall_app_command="sudo /usr/bin/apt autoremove -y proton-vpn-gnome-desktop "
+    "&& sudo /usr/bin/apt install -y proton-vpn-gnome-desktop"
 )
 
 FEDORA_MANAGER = DistroManager(
