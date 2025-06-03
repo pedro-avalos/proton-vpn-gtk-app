@@ -134,7 +134,9 @@ class TestEarlyAccessWidget:
         pytest.param(True, (False, False), ["ubuntu", "debian"], False),    # stable and beta not installed
         pytest.param(True, (True, False), ["slackware"], False),            # unsupported distro
         pytest.param(True, (False, True), ["gentoo"], False),               # unsupported distro
-        pytest.param(True, (False, True), ["opensuse", "sles"], False)      # unsupported distro
+        pytest.param(True, (False, True), ["opensuse", "sles"], False),     # unsupported distro
+        pytest.param(True, (False, True), ["", "debian"], True),            # malformed compatible distro list
+        pytest.param(True, (False, True), ["", "slackware"], False)         # malformed compatible distro list
     ])
     def test_early_access_setting_is_displayed_only_when_system_requirements_are_met(
         self, mock_which, mock_find_installed_repo_packages, which_return, installed_repo_packages, compat_distros, can_early_access_be_displayed

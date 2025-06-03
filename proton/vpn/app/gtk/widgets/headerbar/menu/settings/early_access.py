@@ -35,7 +35,7 @@ from proton.vpn.app.gtk.widgets.headerbar.menu.settings.common import ToggleWidg
 
 logger = logging.getLogger(__name__)
 
-COMPATIBLE_DISTRIBUTIONS = distro.like().split(" ")
+COMPATIBLE_DISTRIBUTIONS = distro.like().split()
 COMPATIBLE_DISTRIBUTIONS.append(distro.id())
 
 
@@ -389,7 +389,7 @@ class EarlyAccessWidget(ToggleWidget):
         for supported_distro_manager in self.SUPPORTED_DISTRO_MANAGERS:
             if shutil.which(supported_distro_manager.package_manager):
                 for supported_distro in supported_distro_manager.names:
-                    if any(dist in supported_distro for dist in COMPATIBLE_DISTRIBUTIONS):
+                    if any(dist == supported_distro for dist in COMPATIBLE_DISTRIBUTIONS):
                         return supported_distro_manager
 
         return None
