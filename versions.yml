@@ -1,55 +1,14 @@
-version: 4.9.7rc6
-time: 2025/06/03 15:30
-author: Richard Paterson
-email: richard.paterson@proton.ch
-urgency: low
-stability: unstable
-description:
-- Fix beta toggling receiving malformed compatible distro list
----
-version: 4.9.7rc5
-time: 2025/06/02 17:30
+version: 4.9.7
+time: 2025/06/06 14:30
 author: Richard Paterson
 email: richard.paterson@proton.ch
 urgency: low
 stability: unstable
 description:
 - Update early access stable and beta packages
----
-version: 4.9.7rc4
-time: 2025/05/28 18:15
-author: Richard Paterson
-email: richard.paterson@proton.ch
-urgency: low
-stability: unstable
-description:
 - Ensures beta toggling uses correct apt command for debian based distributions
----
-version: 4.9.7rc3
-time: 2025/05/26 17:30
-author: Richard Paterson
-email: richard.paterson@proton.ch
-urgency: low
-stability: unstable
-description:
 - Fixes beta toggle activating with incoherent distribution detection
----
-version: 4.9.7rc2
-time: 2025/05/21 11:30
-author: Richard Paterson
-email: richard.paterson@proton.ch
-urgency: low
-stability: unstable
-description:
-- Fixes server row not reflecting current connection state
----
-version: 4.9.7rc1
-time: 2025/05/16 12:00
-author: Richard Paterson
-email: richard.paterson@proton.ch
-urgency: low
-stability: unstable
-description:
+- Fixes server button not reflecting current connection state
 - Removes reconnect message for Netshield, port forwarding, vpn accelerator and Moderate NAT settings changes.
 ---
 version: 4.9.6
