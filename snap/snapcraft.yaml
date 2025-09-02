@@ -1,0 +1,120 @@
+name: proton-vpn-gtk-app
+icon: rpmbuild/SOURCES/proton-vpn-logo.svg
+adopt-info: proton-vpn-gtk-app
+summary: Proton VPN GTK application
+description: |
+  Browse privately and take back control of your personal information with
+  Proton VPN. Connect to one of our high-speed servers to hide your IP address,
+  bypass digital borders, and stream from popular websites and platforms.
+
+  Used by millions worldwide, our secure no-logs VPN does not record your
+  browsing history, display ads, sell your data to third parties, or limit downloads.
+
+  Proton VPN is brought to you by the CERN scientists behind Proton Mail — the
+  world's largest encrypted email service.
+
+  Free VPN features
+
+  - Strict no-logs policy
+  - Zero-access, end-to-end encryption
+  - Full-disk encrypted servers
+  - No bandwidth restrictions
+  - Strong, secure protocols: WireGuard and OpenVPN
+  - IPv6 support
+  - Perfect forward secrecy: Encrypted traffic cannot be captured and
+    decrypted later
+  - DNS leak protection: Ensures DNS queries are never accidentally sent to
+    third-party resolvers
+  - Kill switch: Protects you against IP leaks caused by accidental disconnections
+
+  Premium VPN features
+
+  - Connect to 8500+ high speed servers across 110+ countries
+  - Lightning-fast VPN speeds (up to 10 Gbps)
+  - Connect up to 10 devices at the same time
+  - Stream films, sports events, and videos on any streaming service (Netflix,
+    Hulu, mazon Prime Video, Disney+, BBC iplayer, and more)
+  - P2P (peer-to-peer) servers: Fast torrenting, gaming, and file sharing
+  - Secure Core servers: Enhance your protection with double hop VPN
+  - Tor servers: Connect to onion sites with your regular browser
+  - NetShield Ad-blocker: Protect yourself from ads, trackers, and malware on
+    websites and pps
+  - VPN Accelerator: Unique technology increases VPN speeds by up to 400%
+
+  Why Proton VPN?
+
+  - No personal data required to sign up
+  - Easy-to-use VPN apps for iOS, Android, MacOS, Windows, iPad, Linux, Apple
+    TV, and Android TV
+  - Our high-strength encryption provides a more secure connection than an internet proxy
+  - Independently audited by third-party security experts
+  - Trusted open-source code that anyone can review
+  - Data protection using AES-256 and 4096 RSA encryption
+
+  Join the privacy revolution
+
+  Your support helps us bring online freedom to people around the globe. Join
+  Proton today to protect yourself online and help create a secure, private,
+  and free internet for everyone.
+
+  Experts' opinion
+
+  PCMag: "[Proton VPN's] is a slick VPN with an excellent collection of
+  advanced features, and it has the best free subscription plan we've seen. Few
+  competitors can match its mix of affordability, features, and design. For all
+  that, it gets a rare five-star rating and earns our Editors' Choice award"
+
+  Mozilla: "There are many VPN vendors out there, but not all of them are
+  created equal. Proton VPN offers a secure, reliable, and easy-to-use VPN
+  service and is operated by the makers of ProtonMail, a respected,
+  privacy-oriented email service... As a company they have a track record of
+  fighting for online privacy and they share our dedication to internet safety
+  and security."
+
+website: https://protonvpn.com
+contact: https://github.com/pedro-avalos/proton-vpn-gtk-app/issues
+issues: https://github.com/pedro-avalos/proton-vpn-gtk-app/issues
+source-code: https://github.com/ProtonVPN/proton-vpn-gtk-app
+
+base: core24
+grade: stable
+confinement: strict
+
+platforms:
+  amd64:
+
+apps:
+  proton-vpn-gtk-app:
+    desktop: usr/share/applications/protonvpn-app.desktop
+    command: bin/protonvpn-app
+    extensions: [gnome]
+    plugs:
+      - network
+      - network-bind
+
+package-repositories:
+  - type: apt
+    architectures: [amd64]
+    components: [main]
+    suites: [stable]
+    url: https://repo.protonvpn.com/debian
+    key-id: 84B0D3492C76C9C6F5873C18EDA3E22630349F1C
+
+parts:
+  proton-vpn-gtk-app:
+    source: .
+    plugin: python
+    build-snaps: [yq]
+    build-packages: [git]
+    stage-packages:
+      - python3-proton-core
+      - python3-proton-keyring-linux
+      - python3-proton-vpn-network-manager
+    python-packages:
+      - git+https://github.com/protonvpn/python-proton-core.git
+    override-pull: |
+      craftctl default
+      craftctl set version=$(yq eval --front-matter=extract .version versions.yml)
+    override-build: |
+      craftctl default
+      cp rpmbuild/SOURCES/protonvpn-app.desktop ${CRAFT_PROJECT_INSTALL}/usr/share/applications/
