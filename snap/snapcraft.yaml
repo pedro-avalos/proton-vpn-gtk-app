@@ -88,6 +88,8 @@ apps:
     desktop: usr/share/applications/protonvpn-app.desktop
     command: bin/protonvpn-app
     extensions: [gnome]
+    environment:
+      PYTHONPATH: $SNAP/usr/lib/python3/dist-packages:$PYTHONPATH    
     plugs:
       - network
       - network-bind
@@ -105,16 +107,27 @@ parts:
     source: .
     plugin: python
     build-snaps: [yq]
-    build-packages: [git]
+    build-packages:
+      - build-essential
+      - cmake
+      - libdbus-1-dev
+      - libglib2.0-dev
+      - pkg-config
+      - python3-proton-core
+      - python3-proton-keyring-linux
+      - python3-proton-vpn-network-manager
+      - python3-proton-vpn-api-core
+    build-environment:
+      - PYTHONPATH: /usr/lib/python3/dist-packages
+      - PARTS_PYTHON_VENV_ARGS: --system-site-packages
     stage-packages:
       - python3-proton-core
       - python3-proton-keyring-linux
       - python3-proton-vpn-network-manager
-    python-packages:
-      - git+https://github.com/protonvpn/python-proton-core.git
+      - python3-proton-vpn-api-core
     override-pull: |
       craftctl default
       craftctl set version=$(yq eval --front-matter=extract .version versions.yml)
     override-build: |
       craftctl default
-      cp rpmbuild/SOURCES/protonvpn-app.desktop ${CRAFT_PROJECT_INSTALL}/usr/share/applications/
+      cp rpmbuild/SOURCES/protonvpn-app.desktop ${CRAFT_PART_INSTALL}/usr/share/applications/
